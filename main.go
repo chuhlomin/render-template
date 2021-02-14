@@ -29,6 +29,8 @@ func main() {
 }
 
 func run() error {
+	log.Printf("Vars: %v", os.Getenv("INPUT_VARS"))
+
 	var c config
 	if err := env.Parse(&c); err != nil {
 		return err
