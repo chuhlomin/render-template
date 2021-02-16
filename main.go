@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"strings"
 
 	"github.com/caarlos0/env/v6"
 	"gopkg.in/yaml.v3"
@@ -21,7 +22,7 @@ type config struct {
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Printf("echo \"::error::%v\"", err)
+		fmt.Printf("::error::%v", err)
 		os.Exit(1)
 	}
 }
@@ -66,6 +67,20 @@ func renderTemplate(templateFilePath string, vars vars) error {
 		return fmt.Errorf("failed to render template %q: %v", templateFilePath, err)
 	}
 
-	fmt.Printf("echo \"::set-output name=result::%s\"", result.String())
+	fmt.Printf("::set-output name=result::%s", escape(result.String()))
 	return nil
+}
+
+func escape(str string) string {
+	/*
+		set-output truncates multiline strings.
+		% and \n and \r can be escaped, the runner will unescape in reverse:
+		https://github.community/t/set-output-truncates-multiline-strings/16852
+	*/
+
+	return strings.NewReplacer(
+		"%", "%25",
+		"\n", "%0A",
+		"\r", "%0D",
+	).Replace(str)
 }
