@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"log"
 	"os"
 	"reflect"
 
@@ -12,29 +12,24 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const outputManifestPath = "/tmp/kube.yml"
-
-type Vars map[string]interface{}
+type vars map[string]interface{}
 
 type config struct {
 	Template string `env:"INPUT_TEMPLATE" envDefault:".kube.yml"`
-	Vars     Vars   `env:"INPUT_VARS" envDefault:""`
+	Vars     vars   `env:"INPUT_VARS" envDefault:""`
 }
 
 func main() {
-	log.Printf("Starting...")
-
 	if err := run(); err != nil {
-		log.Fatalf("ERROR: %v", err)
+		fmt.Printf("echo \"::error::%v\"", err)
+		os.Exit(1)
 	}
-
-	log.Printf("Finished")
 }
 
 func run() error {
 	var c config
 	parsers := map[reflect.Type]env.ParserFunc{
-		reflect.TypeOf(Vars{}): func(v string) (interface{}, error) {
+		reflect.TypeOf(vars{}): func(v string) (interface{}, error) {
 			m := map[string]interface{}{}
 			err := yaml.Unmarshal([]byte(v), &m)
 			if err != nil {
@@ -47,18 +42,10 @@ func run() error {
 		return err
 	}
 
-	if err := renderTemplate(outputManifestPath, c.Template, c.Vars); err != nil {
-		return err
-	}
-
-	if err := applyManifest(outputManifestPath); err != nil {
-		return err
-	}
-
-	return nil
+	return renderTemplate(c.Template, c.Vars)
 }
 
-func renderTemplate(outputFilePath string, templateFilePath string, vars Vars) error {
+func renderTemplate(templateFilePath string, vars vars) error {
 	_, err := os.Stat(templateFilePath)
 	if os.IsNotExist(err) {
 		return fmt.Errorf("template file not found (%q)", templateFilePath)
@@ -74,29 +61,11 @@ func renderTemplate(outputFilePath string, templateFilePath string, vars Vars) e
 		return fmt.Errorf("failed to parse template %q: %s", templateFilePath, err)
 	}
 
-	f, err := os.Create(outputFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to open output file %q: %v", outputFilePath, err)
+	var result bytes.Buffer
+	if err = tmpl.Execute(&result, vars); err != nil {
+		return fmt.Errorf("failed to render template %q: %v", templateFilePath, err)
 	}
 
-	if err = tmpl.Execute(f, vars); err != nil {
-		return fmt.Errorf("failed to render manifest from template %q: %v", templateFilePath, err)
-	}
-
-	if err = f.Close(); err != nil {
-		return fmt.Errorf("failed to close file %q: %v", outputFilePath, err)
-	}
-
+	fmt.Printf("echo \"::set-output name=result::%s\"", result.String())
 	return nil
-}
-
-func applyManifest(manifestFilePath string) error {
-	return runCommand(
-		cmdKubectl,
-		[]string{
-			"apply",
-			"-f",
-			manifestFilePath,
-		},
-	)
 }

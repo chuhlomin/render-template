@@ -1,50 +1,19 @@
-name: Kubectl Apply Template
-description: Runs kubectl apply with manifest template
+name: Render Template
+description: Renders file based on template and passed variables
 runs:
   using: docker
   image: Dockerfile
-inputs:
-  image:
-    description: Reference to a Docker image
-    required: true
 
+inputs:
   template:
-    description: Path to Kubernetes manifest template
-    # Rendered using the Go text/template package. If the file does not exist, set `skip_template` to `true`.
+    description: Path to template
     required: false
     default: .kube.yml
 
-  skip_template:
-    description: Parse and apply the Kubernetes manifest template
-    # Turn off the use of the template, regardless if the file exists or not
-    required: false
-    default: "false"
-
-  secret_template:
-    description: Path to Kubernetes Secret resource manifest template"
-    # Rendered using the Go text/template package. If the file does not exist, set `skip_secret_template` to `true`
-    required: false
-    default: .kube.sec.yml
-
-  skip_secret_template:
-    description: Parse and apply the Kubernetes Secret resource manifest template
-    # Turn off the use of the template, regardless if the file exists or not
-    required: false
-    default: "false"
-
-  wait_deployments:
-    description: Wait for the given deployments using kubectl rollout status ...
-    # Deployments can be specified as "<type>/<name>" as expected by kubectl.
-    # If just "<name>" is given it will be defaulted to "deployment/<name>".
-    required: false
-    default: "[]"
-
-  wait_seconds:
-    description: Number of seconds to wait before failing the build
-    # Ignored if wait_deployments is not set
-    required: false
-    default: "0"
-
   vars:
-    description: Variables to use in template and secret_template
+    description: Variables to use in template
     required: false
+
+outputs:
+  result:
+    description: Rendered file content
