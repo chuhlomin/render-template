@@ -18,8 +18,8 @@ LABEL homepage="http://github.com/chuhlomin/render-template"
 LABEL maintainer="Konstantin Chukhlomin <mail@chuhlomin.com>"
 LABEL com.github.actions.name="Render template"
 LABEL com.github.actions.description="Renders file based on template and passed variables"
-LABEL com.github.actions.icon="terminal"
-LABEL com.github.actions.color="blue"
+LABEL com.github.actions.icon="file-text"
+LABEL com.github.actions.color="purple"
 
 COPY --from=build-env /go/bin/app /app
 
