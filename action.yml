@@ -7,10 +7,6 @@ branding:
   icon: file-text
   color: purple
 
-runs:
-  using: docker
-  image: Dockerfile
-
 inputs:
   template:
     description: Path to template
@@ -23,3 +19,7 @@ inputs:
 outputs:
   result:
     description: Rendered file content
+
+runs:
+  using: docker
+  image: 'docker://chuhlomin/render-template:%VERSION%'
