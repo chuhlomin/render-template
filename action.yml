@@ -22,4 +22,4 @@ outputs:
 
 runs:
   using: docker
-  image: 'docker://chuhlomin/render-template:%VERSION%'
+  image: 'docker://chuhlomin/render-template:v1.2'
