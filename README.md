@@ -1,5 +1,7 @@
 # Render Template
 
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/chuhlomin/render-template)
+
 GitHub Action to render file based on template and passed variables.
 
 ## Inputs
