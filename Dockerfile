@@ -1,4 +1,4 @@
-FROM golang:1.15 as build-env
+FROM golang:1.17 as build-env
 
 WORKDIR /go/src/app
 ADD . /go/src/app
