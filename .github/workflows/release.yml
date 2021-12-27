@@ -1,0 +1,29 @@
+name: main
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  DOCKER_IMAGE: chuhlomin/render-template
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to CR
+        uses: docker/login-action@v1
+        with:
+          username: chuhlomin
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Get the tag
+        id: get_tag
+        run: echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
+
+      - name: Tag & push image
+        run: |
+          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          docker tag ${{ env.DOCKER_IMAGE }}:${{ github.sha }} ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.TAG }}
+          docker push ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.TAG }}
