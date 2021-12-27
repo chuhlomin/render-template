@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -16,8 +17,9 @@ import (
 type vars map[string]interface{}
 
 type config struct {
-	Template string `env:"INPUT_TEMPLATE" envDefault:".kube.yml"`
-	Vars     vars   `env:"INPUT_VARS" envDefault:""`
+	Template   string `env:"INPUT_TEMPLATE" envDefault:".kube.yml"`
+	Vars       vars   `env:"INPUT_VARS" envDefault:""`
+	ResultPath string `env:"INPUT_RESULT_PATH" envDefault:""`
 }
 
 func main() {
@@ -43,32 +45,46 @@ func run() error {
 		return err
 	}
 
-	return renderTemplate(c.Template, c.Vars)
+	output, err := renderTemplate(c.Template, c.Vars)
+	if err != nil {
+		return fmt.Errorf("failed to render template: %v", err)
+	}
+
+	fmt.Printf("::set-output name=result::%s", escape(output))
+
+	if len(c.ResultPath) != 0 {
+		err := ioutil.WriteFile(c.ResultPath, []byte(output), 0644)
+		if err != nil {
+			return fmt.Errorf("failed to write file %q: %v", c.ResultPath, err)
+		}
+	}
+
+	return nil
 }
 
-func renderTemplate(templateFilePath string, vars vars) error {
-	_, err := os.Stat(templateFilePath)
-	if os.IsNotExist(err) {
-		return fmt.Errorf("template file not found (%q)", templateFilePath)
-	}
-
+func renderTemplate(templateFilePath string, vars vars) (string, error) {
 	b, err := ioutil.ReadFile(templateFilePath)
 	if err != nil {
-		return fmt.Errorf("failed to read template %q: %v", templateFilePath, err)
+		if errors.Is(err, os.ErrNotExist) {
+			return "", fmt.Errorf("template file not found (%q)", templateFilePath)
+		}
+		if errors.Is(err, os.ErrPermission) {
+			return "", fmt.Errorf("have no permissions to read template file (%q)", templateFilePath)
+		}
+		return "", fmt.Errorf("failed to read template %q: %v", templateFilePath, err)
 	}
 
-	tmpl, err := template.New(".kube.yml").Option("missingkey=error").Parse(string(b))
+	tmpl, err := template.New(templateFilePath).Option("missingkey=error").Parse(string(b))
 	if err != nil {
-		return fmt.Errorf("failed to parse template %q: %s", templateFilePath, err)
+		return "", err
 	}
 
 	var result bytes.Buffer
 	if err = tmpl.Execute(&result, vars); err != nil {
-		return fmt.Errorf("failed to render template %q: %v", templateFilePath, err)
+		return "", err
 	}
 
-	fmt.Printf("::set-output name=result::%s", escape(result.String()))
-	return nil
+	return result.String(), nil
 }
 
 func escape(str string) string {

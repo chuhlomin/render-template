@@ -16,6 +16,10 @@ inputs:
     description: Variables to use in template
     required: false
 
+  result_path:
+    description: Desired path to result file (optional)
+    required: false
+
 outputs:
   result:
     description: Rendered file content

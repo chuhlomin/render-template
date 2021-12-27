@@ -1,6 +1,6 @@
-module github.com/chuhlomin/kat
+module github.com/chuhlomin/render-template
 
-go 1.15
+go 1.17
 
 require (
 	github.com/caarlos0/env/v6 v6.5.0
