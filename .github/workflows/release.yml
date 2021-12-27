@@ -9,7 +9,7 @@ env:
   DOCKER_IMAGE: chuhlomin/render-template
 
 jobs:
-  main:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Login to CR
