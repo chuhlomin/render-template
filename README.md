@@ -1,6 +1,6 @@
 # Render Template
 
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/chuhlomin/render-template)](https://hub.docker.com/repository/docker/chuhlomin/render-template/builds)
+[![main](https://github.com/chuhlomin/homepage/actions/workflows/main.yml/badge.svg)](https://github.com/chuhlomin/homepage/actions/workflows/main.yml) [![release](https://github.com/chuhlomin/homepage/actions/workflows/release.yml/badge.svg)](https://github.com/chuhlomin/homepage/actions/workflows/release.yml)
 
 GitHub Action to render file based on template and passed variables.
 
@@ -8,6 +8,7 @@ GitHub Action to render file based on template and passed variables.
 
 * `template` – path to Go template file
 * `vars` – template variables in YAML format
+* `result_path` – (optional) desired path to result file
 
 ## Output
 
