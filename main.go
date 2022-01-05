@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"html/template"
 	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
+	"text/template"
 
 	"github.com/caarlos0/env/v6"
 	"gopkg.in/yaml.v3"

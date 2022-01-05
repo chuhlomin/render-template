@@ -60,6 +60,14 @@ func TestRenderTemplate(t *testing.T) {
 			errors.New("template: ./testdata/invalid.txt:1: missing value for if"),
 			"",
 		},
+		{
+			"./testdata/template.txt",
+			map[string]interface{}{
+				"name": "text+text",
+			},
+			nil,
+			"Hello text+text\n",
+		},
 	}
 
 	for _, tt := range tests {
