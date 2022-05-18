@@ -1,6 +1,6 @@
 # Render Template
 
-[![main](https://github.com/chuhlomin/homepage/actions/workflows/main.yml/badge.svg)](https://github.com/chuhlomin/homepage/actions/workflows/main.yml) [![release](https://github.com/chuhlomin/homepage/actions/workflows/release.yml/badge.svg)](https://github.com/chuhlomin/homepage/actions/workflows/release.yml)
+[![main](https://github.com/chuhlomin/render-template/actions/workflows/main.yml/badge.svg)](https://github.com/chuhlomin/render-template/actions/workflows/main.yml) [![release](https://github.com/chuhlomin/render-template/actions/workflows/release.yml/badge.svg)](https://github.com/chuhlomin/render-template/actions/workflows/release.yml)
 
 GitHub Action to render file based on template and passed variables.
 
@@ -60,7 +60,7 @@ jobs:
       ...
       - name: Render template
         id: render_template
-        uses: chuhlomin/render-template@v1.2
+        uses: chuhlomin/render-template@v1.4
         with:
           template: kube.template.yml
           vars: |
