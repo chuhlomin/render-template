@@ -16,6 +16,10 @@ inputs:
     description: Variables to use in template
     required: false
 
+  vars_path:
+    description: Path to YAML file with variables
+    required: false
+
   result_path:
     description: Desired path to result file (optional)
     required: false
@@ -26,4 +30,4 @@ outputs:
 
 runs:
   using: docker
-  image: 'docker://chuhlomin/render-template:v1.4'
+  image: 'docker://chuhlomin/render-template:v1.5'

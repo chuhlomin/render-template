@@ -19,6 +19,7 @@ type vars map[string]interface{}
 type config struct {
 	Template   string `env:"INPUT_TEMPLATE" envDefault:".kube.yml"`
 	Vars       vars   `env:"INPUT_VARS" envDefault:""`
+	VarsPath   string `env:"INPUT_VARS_PATH" envDefault:""`
 	ResultPath string `env:"INPUT_RESULT_PATH" envDefault:""`
 }
 
@@ -36,6 +37,18 @@ func run() error {
 	}
 	if err := env.ParseWithFuncs(&c, parsers); err != nil {
 		return err
+	}
+
+	if c.VarsPath != "" {
+		varsFile, err := ioutil.ReadFile(c.VarsPath)
+		if err != nil {
+			return fmt.Errorf("failed to read vars file %q: %v", c.VarsPath, err)
+		}
+		var varsFromFile vars
+		if err = yaml.Unmarshal(varsFile, &varsFromFile); err != nil {
+			return fmt.Errorf("failed to parse vars file %q: %v", c.VarsPath, err)
+		}
+		c.Vars = mergeVars(c.Vars, varsFromFile)
 	}
 
 	output, err := renderTemplate(c.Template, c.Vars)
@@ -62,6 +75,20 @@ func varsParser(v string) (interface{}, error) {
 		return nil, fmt.Errorf("unable to parse Vars: %v", err)
 	}
 	return m, nil
+}
+
+func mergeVars(a, b vars) vars {
+	if a == nil {
+		return b
+	}
+
+	for k, v := range b {
+		if _, ok := a[k]; ok {
+			continue
+		}
+		a[k] = v
+	}
+	return a
 }
 
 func renderTemplate(templateFilePath string, vars vars) (string, error) {

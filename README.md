@@ -8,7 +8,11 @@ GitHub Action to render file based on template and passed variables.
 
 * `template` – path to Go template file
 * `vars` – template variables in YAML format
+* `vars_path` – Path to YAML file with variables
 * `result_path` – (optional) desired path to result file
+
+You must set either `vars` or `vars_path`, or you may set both of them
+(`vars` values will take precedence over `vars_path`).
 
 ## Output
 
@@ -60,7 +64,7 @@ jobs:
       ...
       - name: Render template
         id: render_template
-        uses: chuhlomin/render-template@v1.4
+        uses: chuhlomin/render-template@v1.5
         with:
           template: kube.template.yml
           vars: |

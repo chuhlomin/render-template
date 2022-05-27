@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"reflect"
 	"testing"
 )
 
@@ -169,6 +170,65 @@ func TestRenderTemplate(t *testing.T) {
 				tt.expectedOutput,
 				output,
 			)
+		}
+	}
+}
+
+func TestMergeVars(t *testing.T) {
+	tests := []struct {
+		vars, varsFromFile, expectedResult vars
+	}{
+		{
+			map[string]interface{}{
+				"key_1": "value_1",
+			},
+			map[string]interface{}{
+				"key_2": "value_2",
+			},
+			map[string]interface{}{
+				"key_1": "value_1",
+				"key_2": "value_2",
+			},
+		},
+		{
+			map[string]interface{}{
+				"key": "value_1",
+			},
+			map[string]interface{}{
+				"key": "value_2",
+			},
+			map[string]interface{}{
+				"key": "value_1",
+			},
+		},
+		{
+			nil,
+			map[string]interface{}{
+				"key": "value",
+			},
+			map[string]interface{}{
+				"key": "value",
+			},
+		},
+		{
+			nil,
+			nil,
+			nil,
+		},
+		{
+			map[string]interface{}{
+				"key": "value",
+			},
+			nil,
+			map[string]interface{}{
+				"key": "value",
+			},
+		},
+	}
+	for _, tt := range tests {
+		result := mergeVars(tt.vars, tt.varsFromFile)
+		if !reflect.DeepEqual(result, tt.expectedResult) {
+			t.Errorf("mergeVars(%v, %v) expected: %v, got: %v", tt.vars, tt.varsFromFile, tt.expectedResult, result)
 		}
 	}
 }
