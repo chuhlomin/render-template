@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"testing"
 )
@@ -21,6 +22,80 @@ func TestEscape(t *testing.T) {
 		actual := escape(tt.in)
 		if actual != tt.expected {
 			t.Errorf("escape(%q) was incorrect, got: %q, want: %q.", tt.in, actual, tt.expected)
+		}
+	}
+}
+
+func TestVarsParser(t *testing.T) {
+	tests := []struct {
+		in           string
+		expectedJSON string
+		err          error
+	}{
+		{
+			`
+key: value`,
+			`{"key":"value"}`,
+			nil,
+		},
+		{
+			`
+key: |
+  value`,
+			`{"key":"value"}`,
+			nil,
+		},
+		{
+			`
+key: |
+  line 1
+  line 2`,
+			`{"key":"line 1\nline 2"}`,
+			nil,
+		},
+		{
+			`
+key: |
+  line 1: val1
+line 2: val2
+  line 3: val3`,
+			``,
+			errors.New("unable to parse Vars: yaml: line 5: mapping values are not allowed in this context"),
+		},
+		{
+			`
+key: "line 1: val1
+line 2: val2
+  line 3: val3"`,
+			`{"key":"line 1: val1 line 2: val2 line 3: val3"}`,
+			nil,
+		},
+		{
+			`{"key": "val1"}`,
+			`{"key":"val1"}`,
+			nil,
+		},
+	}
+
+	for _, tt := range tests {
+		actual, err := varsParser(tt.in)
+		if tt.err != nil {
+			if err == nil {
+				t.Errorf("varsParser(%q) was incorrect, got: nil, want: %q.", tt.in, tt.err)
+			}
+			if err.Error() != tt.err.Error() {
+				t.Errorf("varsParser(%q) was incorrect, got: %q, want: %q.", tt.in, err, tt.err)
+			}
+			continue
+		}
+
+		actualJSONBytes, err := json.Marshal(actual)
+		if err != nil {
+			t.Errorf("varsParser (%q) failed to marshal actual %v", tt.in, actual)
+		}
+
+		if string(actualJSONBytes) != tt.expectedJSON {
+			t.Errorf("varsParser(%q) was incorrect, got: %q, want: %q.", tt.in, string(actualJSONBytes), tt.expectedJSON)
 		}
 	}
 }

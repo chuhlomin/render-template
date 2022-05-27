@@ -32,14 +32,7 @@ func main() {
 func run() error {
 	var c config
 	parsers := map[reflect.Type]env.ParserFunc{
-		reflect.TypeOf(vars{}): func(v string) (interface{}, error) {
-			m := map[string]interface{}{}
-			err := yaml.Unmarshal([]byte(v), &m)
-			if err != nil {
-				return nil, fmt.Errorf("unable to parse Vars: %v", err)
-			}
-			return m, nil
-		},
+		reflect.TypeOf(vars{}): varsParser,
 	}
 	if err := env.ParseWithFuncs(&c, parsers); err != nil {
 		return err
@@ -60,6 +53,15 @@ func run() error {
 	}
 
 	return nil
+}
+
+func varsParser(v string) (interface{}, error) {
+	m := map[string]interface{}{}
+	err := yaml.Unmarshal([]byte(v), &m)
+	if err != nil {
+		return nil, fmt.Errorf("unable to parse Vars: %v", err)
+	}
+	return m, nil
 }
 
 func renderTemplate(templateFilePath string, vars vars) (string, error) {
