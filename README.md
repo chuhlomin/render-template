@@ -6,17 +6,21 @@ GitHub Action to render file based on template and passed variables.
 
 ## Inputs
 
-* `template` – path to Go template file
-* `vars` – template variables in YAML format
-* `vars_path` – Path to YAML file with variables
-* `result_path` – (optional) desired path to result file
+| Name        | Description                                   | Required |
+|-------------|-----------------------------------------------|----------|
+| template    | Path to template                              | true     |
+| vars        | Variables to use in template (in YAML format) | false    |
+| vars_path   | Path to YAML file with variables              | false    |
+| result_path | Desired path to result file                   | false    |
 
-You must set either `vars` or `vars_path`, or you may set both of them
-(`vars` values will take precedence over `vars_path`).
+You must set at least `vars` or `vars_path`.  
+You may set both of them (`vars` values will precede over `vars_path`).
 
-## Output
+## Outputs
 
-`result` – rendered template
+| Name   | Description           |
+|--------|-----------------------|
+| result | Rendered file content |
 
 ## Example
 
@@ -61,7 +65,11 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      ...
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      <...>
+
       - name: Render template
         id: render_template
         uses: chuhlomin/render-template@v1.5
