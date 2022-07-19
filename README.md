@@ -1,6 +1,8 @@
 # Render Template
 
-[![main](https://github.com/chuhlomin/render-template/actions/workflows/main.yml/badge.svg)](https://github.com/chuhlomin/render-template/actions/workflows/main.yml) [![release](https://github.com/chuhlomin/render-template/actions/workflows/release.yml/badge.svg)](https://github.com/chuhlomin/render-template/actions/workflows/release.yml)
+[![main](https://github.com/chuhlomin/render-template/actions/workflows/main.yml/badge.svg)](https://github.com/chuhlomin/render-template/actions/workflows/main.yml)
+[![release](https://github.com/chuhlomin/render-template/actions/workflows/release.yml/badge.svg)](https://github.com/chuhlomin/render-template/actions/workflows/release.yml)
+[![DockerHub](https://img.shields.io/badge/docker-hub-4988CC)](https://hub.docker.com/repository/docker/chuhlomin/render-template)
 
 GitHub Action to render file based on template and passed variables.
 
