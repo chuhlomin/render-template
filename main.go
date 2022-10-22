@@ -66,6 +66,8 @@ func run() error {
 		return fmt.Errorf("failed to set GITHUB_OUTPUT: %v", err)
 	}
 
+	fmt.Printf("::debug::%s", os.Getenv("GITHUB_OUTPUT"))
+
 	if len(c.ResultPath) != 0 {
 		err := ioutil.WriteFile(c.ResultPath, []byte(output), 0644)
 		if err != nil {
