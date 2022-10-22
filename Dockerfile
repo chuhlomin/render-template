@@ -23,4 +23,7 @@ LABEL com.github.actions.color="purple"
 
 COPY --from=build-env /go/bin/app /app
 
-CMD ["/app"]
+# CMD ["/app"]
+
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
