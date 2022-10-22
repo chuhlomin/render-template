@@ -7,7 +7,8 @@ RUN go get -d -v ./...
 RUN go build -o /go/bin/app
 
 
-FROM gcr.io/distroless/static:966f4bd97f611354c4ad829f1ed298df9386c2ec
+FROM alpine:latest
+# gcr.io/distroless/static:966f4bd97f611354c4ad829f1ed298df9386c2ec
 # latest-amd64 -> 966f4bd97f611354c4ad829f1ed298df9386c2ec
 # https://github.com/GoogleContainerTools/distroless/tree/master/base
 
