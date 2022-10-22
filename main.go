@@ -56,7 +56,15 @@ func run() error {
 		return fmt.Errorf("failed to render template: %v", err)
 	}
 
-	fmt.Printf("::set-output name=result::%s", escape(output))
+	githubOutput := fmt.Sprintf("%s=%s", "result", escape(output))
+	if os.Getenv("GITHUB_OUTPUT") != "" {
+		githubOutput = fmt.Sprintln(os.Getenv("GITHUB_OUTPUT")) + githubOutput
+	}
+
+	err = os.Setenv("GITHUB_OUTPUT", githubOutput)
+	if err != nil {
+		return fmt.Errorf("failed to set GITHUB_OUTPUT: %v", err)
+	}
 
 	if len(c.ResultPath) != 0 {
 		err := ioutil.WriteFile(c.ResultPath, []byte(output), 0644)

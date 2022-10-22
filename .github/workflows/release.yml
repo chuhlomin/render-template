@@ -20,10 +20,10 @@ jobs:
 
       - name: Get the tag
         id: get_tag
-        run: echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
+        run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
       - name: Tag & push image
         run: |
           docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-          docker tag ${{ env.DOCKER_IMAGE }}:${{ github.sha }} ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.TAG }}
-          docker push ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.TAG }}
+          docker tag ${{ env.DOCKER_IMAGE }}:${{ github.sha }} ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
+          docker push ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
