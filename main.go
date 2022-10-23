@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"text/template"
@@ -39,7 +38,7 @@ func run() error {
 	}
 
 	if c.VarsPath != "" {
-		varsFile, err := ioutil.ReadFile(c.VarsPath)
+		varsFile, err := os.ReadFile(c.VarsPath)
 		if err != nil {
 			return fmt.Errorf("failed to read vars file %q: %v", c.VarsPath, err)
 		}
@@ -60,7 +59,7 @@ func run() error {
 	}
 
 	if len(c.ResultPath) != 0 {
-		err := ioutil.WriteFile(c.ResultPath, []byte(output), 0644)
+		err := os.WriteFile(c.ResultPath, []byte(output), 0644)
 		if err != nil {
 			return fmt.Errorf("failed to write file %q: %v", c.ResultPath, err)
 		}
@@ -93,7 +92,7 @@ func mergeVars(a, b vars) vars {
 }
 
 func renderTemplate(templateFilePath string, vars vars) (string, error) {
-	b, err := ioutil.ReadFile(templateFilePath)
+	b, err := os.ReadFile(templateFilePath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return "", fmt.Errorf("template file not found (%q)", templateFilePath)
