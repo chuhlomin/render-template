@@ -27,6 +27,8 @@ inputs:
 outputs:
   result:
     description: Rendered file content
+  result_from_entrypoint:
+    description: Just for testing
 
 runs:
   using: docker

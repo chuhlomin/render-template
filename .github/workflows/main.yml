@@ -34,9 +34,12 @@ jobs:
         uses: ./ # Uses an action in the root directory
         id: render
         with:
-          template: ./testdata/template.txt
+          template: ./testdata/template_debug.txt
           vars: |
             name: world
 
-      - name: Get the output
+      - name: Get `result_from_entrypoint` output
+        run: echo "${{ steps.render.outputs.result_from_entrypoint }}"
+
+      - name: Get `result` output
         run: echo "${{ steps.render.outputs.result }}"
