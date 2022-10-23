@@ -1,8 +1,7 @@
 #!/bin/sh -l
 
-/app
+#/app
 
-time=$(date)
-echo "time=$time" >> $GITHUB_OUTPUT
+echo "Template: $INPUT_TEMPLATE"
 
-echo $GITHUB_OUTPUT
+echo "result=123" >> $GITHUB_OUTPUT
