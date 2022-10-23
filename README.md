@@ -74,7 +74,7 @@ jobs:
 
       - name: Render template
         id: render_template
-        uses: chuhlomin/render-template@v1.5
+        uses: chuhlomin/render-template@v1.6
         with:
           template: kube.template.yml
           vars: |

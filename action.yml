@@ -30,4 +30,4 @@ outputs:
 
 runs:
   using: docker
-  image: 'docker://chuhlomin/render-template:v1.5'
+  image: 'docker://chuhlomin/render-template:v1.6'
