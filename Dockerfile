@@ -3,8 +3,8 @@ FROM golang:1.17 as build-env
 WORKDIR /go/src/app
 ADD . /go/src/app
 
-RUN go get -d -v ./...
-RUN go build -o /go/bin/app
+RUN go test -mod=vendor -cover ./...
+RUN go build -mod=vendor -o /go/bin/app
 
 
 FROM gcr.io/distroless/static:966f4bd97f611354c4ad829f1ed298df9386c2ec

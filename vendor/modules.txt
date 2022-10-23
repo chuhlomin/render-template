@@ -1,0 +1,6 @@
+# github.com/caarlos0/env/v6 v6.9.2
+## explicit; go 1.17
+github.com/caarlos0/env/v6
+# gopkg.in/yaml.v3 v3.0.0
+## explicit
+gopkg.in/yaml.v3
