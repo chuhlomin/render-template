@@ -7,22 +7,23 @@ import (
 	"testing"
 )
 
-func TestEscape(t *testing.T) {
+func TestFormatOutput(t *testing.T) {
 	tests := []struct {
 		in       string
 		expected string
 	}{
 		{"", ""},
-		{"text", "text"},
-		{"%", "%25"},
-		{"\n", "%0A"},
-		{"\r", "%0D"},
+		{"text", "result=text"},
+		{"%", "result=%"},
+		{"some\ntext", "result<<OUTPUT\nsome\ntext\nOUTPUT"},
+		{"\n", "result<<OUTPUT\n\n\nOUTPUT"},
+		{"\r", "result=\r"},
 	}
 
 	for _, tt := range tests {
-		actual := escape(tt.in)
+		actual := formatOutput("result", tt.in)
 		if actual != tt.expected {
-			t.Errorf("escape(%q) was incorrect, got: %q, want: %q.", tt.in, actual, tt.expected)
+			t.Errorf("formatOutput(%q) was incorrect, got: %q, want: %q.", tt.in, actual, tt.expected)
 		}
 	}
 }
