@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
-	"strings"
 	"text/template"
 
 	"github.com/caarlos0/env/v6"
@@ -56,17 +55,9 @@ func run() error {
 		return fmt.Errorf("failed to render template: %v", err)
 	}
 
-	githubOutput := fmt.Sprintf("%s=%s", "result", escape(output))
-	if os.Getenv("GITHUB_OUTPUT") != "" {
-		githubOutput = fmt.Sprintln(os.Getenv("GITHUB_OUTPUT")) + githubOutput
+	if err = writeOutput(output); err != nil {
+		return err
 	}
-
-	err = os.Setenv("GITHUB_OUTPUT", githubOutput)
-	if err != nil {
-		return fmt.Errorf("failed to set GITHUB_OUTPUT: %v", err)
-	}
-
-	fmt.Printf("::debug::%s", os.Getenv("GITHUB_OUTPUT"))
 
 	if len(c.ResultPath) != 0 {
 		err := ioutil.WriteFile(c.ResultPath, []byte(output), 0644)
@@ -126,16 +117,36 @@ func renderTemplate(templateFilePath string, vars vars) (string, error) {
 	return result.String(), nil
 }
 
-func escape(str string) string {
-	/*
-		set-output truncates multiline strings.
-		% and \n and \r can be escaped, the runner will unescape in reverse:
-		https://github.community/t/set-output-truncates-multiline-strings/16852
-	*/
+func writeOutput(output string) error {
+	githubOutput := formatOutput("result", output)
+	if githubOutput == "" {
+		return nil
+	}
 
-	return strings.NewReplacer(
-		"%", "%25",
-		"\n", "%0A",
-		"\r", "%0D",
-	).Replace(str)
+	path := os.Getenv("GITHUB_OUTPUT")
+
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open result file %q: %v", path, err)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(githubOutput); err != nil {
+		return fmt.Errorf("failed to write result to file %q: %v", path, err)
+	}
+
+	return nil
+}
+
+func formatOutput(name, value string) string {
+	if value == "" {
+		return ""
+	}
+
+	// if value contains new line, use multiline format
+	if bytes.ContainsRune([]byte(value), '\n') {
+		return fmt.Sprintf("%s<<OUTPUT\n%s\nOUTPUT", name, value)
+	}
+
+	return fmt.Sprintf("%s=%s", name, value)
 }
