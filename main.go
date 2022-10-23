@@ -56,16 +56,18 @@ func run() error {
 	}
 
 	githubOutput := formatOutput("result", output)
-	if os.Getenv("GITHUB_OUTPUT") != "" {
-		githubOutput = fmt.Sprintln(os.Getenv("GITHUB_OUTPUT")) + githubOutput
-	}
+	if githubOutput != "" {
+		// append it to the end of $GITHUB_OUTPUT file
+		f, err := os.OpenFile(os.Getenv("GITHUB_OUTPUT"), os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			return fmt.Errorf("failed to open result file %q: %v", c.ResultPath, err)
+		}
 
-	err = os.Setenv("GITHUB_OUTPUT", githubOutput)
-	if err != nil {
-		return fmt.Errorf("failed to set GITHUB_OUTPUT: %v", err)
+		defer f.Close()
+		if _, err = f.WriteString(githubOutput); err != nil {
+			return fmt.Errorf("failed to write result to file %q: %v", c.ResultPath, err)
+		}
 	}
-
-	fmt.Printf("::info::%s", os.Getenv("GITHUB_OUTPUT"))
 
 	if len(c.ResultPath) != 0 {
 		err := ioutil.WriteFile(c.ResultPath, []byte(output), 0644)
