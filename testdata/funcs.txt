@@ -1,0 +1,4 @@
+{{ "2023-08-06T15:08:28Z" | date "2006-01-02" }}
+{{ "https://github.com" | mdlink "download" }}
+{{ "1000" | number }}
+{{ "ABC" | base64 }}

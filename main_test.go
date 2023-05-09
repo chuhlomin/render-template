@@ -145,6 +145,12 @@ func TestRenderTemplate(t *testing.T) {
 			nil,
 			"Hello text+text\n",
 		},
+		{
+			"./testdata/funcs.txt",
+			map[string]interface{}{},
+			nil,
+			"2023-08-06\n[download](https://github.com)\n1,000\nQUJD\n",
+		},
 	}
 
 	for _, tt := range tests {

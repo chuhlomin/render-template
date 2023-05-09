@@ -2,13 +2,19 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"reflect"
+	"strconv"
 	"text/template"
+	"time"
 
 	"github.com/caarlos0/env/v6"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 	"gopkg.in/yaml.v3"
 )
 
@@ -91,6 +97,32 @@ func mergeVars(a, b vars) vars {
 	return a
 }
 
+var funcMap = template.FuncMap{
+	"date": func(format, in string) string {
+		t, err := time.Parse(time.RFC3339, in)
+		if err != nil {
+			log.Printf("failed to parse date %q: %v", in, err)
+			return in
+		}
+		return t.Format(format)
+	},
+	"mdlink": func(text, url string) string {
+		return fmt.Sprintf("[%s](%s)", text, url)
+	},
+	"number": func(in string) string {
+		p := message.NewPrinter(language.English)
+		d, err := strconv.ParseInt(in, 10, 64)
+		if err != nil {
+			log.Printf("failed to parse number %q: %v", in, err)
+			return in
+		}
+		return p.Sprintf("%d", d)
+	},
+	"base64": func(in string) string {
+		return base64.StdEncoding.EncodeToString([]byte(in))
+	},
+}
+
 func renderTemplate(templateFilePath string, vars vars) (string, error) {
 	b, err := os.ReadFile(templateFilePath)
 	if err != nil {
@@ -103,7 +135,11 @@ func renderTemplate(templateFilePath string, vars vars) (string, error) {
 		return "", fmt.Errorf("failed to read template %q: %v", templateFilePath, err)
 	}
 
-	tmpl, err := template.New(templateFilePath).Option("missingkey=error").Parse(string(b))
+	tmpl, err := template.
+		New(templateFilePath).
+		Option("missingkey=error").
+		Funcs(funcMap).
+		Parse(string(b))
 	if err != nil {
 		return "", err
 	}

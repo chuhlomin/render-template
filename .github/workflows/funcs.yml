@@ -1,0 +1,51 @@
+name: main
+
+on:
+  push:
+    branches:
+      - feat/funcs
+      
+env:
+  DOCKER_IMAGE: chuhlomin/render-template
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to CR
+        uses: docker/login-action@v2
+        with:
+          username: chuhlomin
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          tags: funcs
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Test action
+        uses: ./ # Uses an action in the root directory
+        id: render
+        with:
+          template: ./testdata/template.txt
+          vars: |
+            name: world
+
+      - name: Get `result` output
+        run: echo "${{ steps.render.outputs.result }}"
