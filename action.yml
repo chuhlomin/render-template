@@ -24,6 +24,10 @@ inputs:
     description: Desired path to result file (optional)
     required: false
 
+  timezone:
+    description: Timezone to format dates in template
+    required: false
+
 outputs:
   result:
     description: Rendered file content

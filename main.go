@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"text/template"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/caarlos0/env/v6"
 	"golang.org/x/text/language"
@@ -98,12 +99,33 @@ func mergeVars(a, b vars) vars {
 }
 
 var funcMap = template.FuncMap{
-	"date": func(format, in string) string {
-		t, err := time.Parse(time.RFC3339, in)
-		if err != nil {
-			log.Printf("failed to parse date %q: %v", in, err)
-			return in
+	"date": func(format string, in interface{}) string {
+		var t time.Time
+		switch v := in.(type) {
+		case string:
+			var err error
+			t, err = time.Parse(time.RFC3339, v)
+			if err != nil {
+				log.Printf("failed to parse date %q: %v", v, err)
+				return v
+			}
+		case time.Time:
+			t = v
+		default:
+			log.Printf("unsupported type %T for date", in)
+			return fmt.Sprintf("%v", in)
 		}
+
+		timezone := os.Getenv("INPUT_TIMEZONE")
+		if timezone != "" {
+			loc, err := time.LoadLocation(timezone)
+			if err != nil {
+				log.Printf("failed to load timezone %q: %v", timezone, err)
+				return in.(string)
+			}
+			t = t.In(loc)
+		}
+
 		return t.Format(format)
 	},
 	"mdlink": func(text, url string) string {
