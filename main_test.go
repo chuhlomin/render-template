@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"os"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestFormatOutput(t *testing.T) {
@@ -145,7 +147,17 @@ func TestRenderTemplate(t *testing.T) {
 			nil,
 			"Hello text+text\n",
 		},
+		{
+			"./testdata/funcs.txt",
+			map[string]interface{}{
+				"time": time.Date(2023, time.August, 6, 15, 8, 28, 0, time.UTC),
+			},
+			nil,
+			"06 Aug 2023 11:08:28\n06 Aug 2023 11:08:28\n[download](https://github.com)\n1,000\nQUJD\n",
+		},
 	}
+
+	os.Setenv("INPUT_TIMEZONE", "America/New_York")
 
 	for _, tt := range tests {
 		output, err := renderTemplate(tt.templateFilePath, tt.vars)
