@@ -14,9 +14,25 @@ GitHub Action to render file based on template and passed variables.
 | vars        | Variables to use in template (in YAML format) | false    |
 | vars_path   | Path to YAML file with variables              | false    |
 | result_path | Desired path to result file                   | false    |
+| timezone    | Timezone to use in `date` template function   | false    |
 
 You must set at least `vars` or `vars_path`.  
 You may set both of them (`vars` values will precede over `vars_path`).
+
+There are few template functions available:
+
+- `date` – formats timestamp using Go's [time layout](https://golang.org/pkg/time/#pkg-constants).  
+  Example: `{{ "2023-05-11T01:42:04Z" | date "2006-01-02" }}` will be rendered as `2023-05-11`.  
+  You may use `timezone` input to set timezone for `date` function (e.g. `timezone: "America/New_York"`).
+
+- `mdlink` – creates markdown link.  
+  Example: `{{ "https://github.com" | mdlink "GitHub" }}` will be rendered as `[GitHub](https://github.com)`.
+
+- `number` – formats number in English locale.  
+  Example: `{{ 1234567890 | number }}` will be rendered as `1,234,567,890`.
+
+- `base64` – encodes string to base64.  
+  Example: `{{ "hello" | base64 }}` will be rendered as `aGVsbG8=`.
 
 ## Outputs
 
@@ -74,7 +90,7 @@ jobs:
 
       - name: Render template
         id: render_template
-        uses: chuhlomin/render-template@v1.6
+        uses: chuhlomin/render-template@v1.7
         with:
           template: kube.template.yml
           vars: |
