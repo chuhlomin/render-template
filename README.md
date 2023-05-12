@@ -19,7 +19,7 @@ GitHub Action to render file based on template and passed variables.
 You must set at least `vars` or `vars_path`.  
 You may set both of them (`vars` values will precede over `vars_path`).
 
-Vars may not contain any hyphons in their name.
+Variables names must be alphanumeric strings (must not contain any hyphens).
 
 There are few template functions available:
 
