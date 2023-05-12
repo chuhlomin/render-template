@@ -19,6 +19,8 @@ GitHub Action to render file based on template and passed variables.
 You must set at least `vars` or `vars_path`.  
 You may set both of them (`vars` values will precede over `vars_path`).
 
+Variables names must be alphanumeric strings (must not contain any hyphens).
+
 There are few template functions available:
 
 - `date` – formats timestamp using Go's [time layout](https://golang.org/pkg/time/#pkg-constants).  
