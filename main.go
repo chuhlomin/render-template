@@ -184,7 +184,13 @@ func writeOutput(output string) error {
 
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		return fmt.Errorf("failed to open result file %q: %v", path, err)
+		return fmt.Errorf(
+			"failed to open result file %q: %v. "+
+				"If you are using self-hosted runners "+
+				"make sure they are updated to version 2.297.0 or greater",
+			path,
+			err,
+		)
 	}
 	defer f.Close()
 
