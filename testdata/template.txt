@@ -1,1 +1,5 @@
 Hello {{ .name }}
+
+| Github Link                        | Twitter Link                      |
+| ----------------------------------- | ------------------------------- |
+| {{ "https://github.com" | mdlink "GitHub" }} | {{ "https://twitter.com" | mdlink "Twitter" }} |
