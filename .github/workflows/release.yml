@@ -12,18 +12,17 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to CR
-        uses: docker/login-action@v2
-        with:
-          username: chuhlomin
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Get the tag
         id: get_tag
         run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
-      - name: Tag & push image
-        run: |
-          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-          docker tag ${{ env.DOCKER_IMAGE }}:${{ github.sha }} ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
-          docker push ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
+      - name: Build and push Docker image
+        uses: chuhlomin/actions/docker-build-push@main
+        with:
+          username: chuhlomin
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          image_name: ${{ env.DOCKER_IMAGE }}
+          tags: ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
