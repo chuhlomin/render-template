@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feat/docker-multiarch
       
 env:
   DOCKER_IMAGE: chuhlomin/render-template
@@ -15,29 +16,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Login to CR
-        uses: docker/login-action@v2
+      - name: Build and push Docker image
+        uses: chuhlomin/actions/docker-build-push@main
         with:
           username: chuhlomin
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: latest
-
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
+          image_name: ${{ env.DOCKER_IMAGE }}
           tags: |
-            ${{ steps.meta.outputs.tags }}
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-          labels: ${{ steps.meta.outputs.labels }}
+            ${{ env.DOCKER_IMAGE }}:latest
 
       - name: Test action
         uses: ./ # Uses an action in the root directory
