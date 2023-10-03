@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      - feat/docker-multiarch
-      
+
 env:
   DOCKER_IMAGE: chuhlomin/render-template
 
