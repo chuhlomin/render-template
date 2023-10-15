@@ -26,3 +26,20 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           image_name: ${{ env.DOCKER_IMAGE }}
           tags: ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
+
+  update-tag:
+    runs-on: ubuntu-latest
+    environment: v1 # requires approval
+    needs: release
+    if: startsWith(github.ref, 'refs/tags/v1.')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Update v1 tag
+        shell: bash
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "gha@chuhlomin.com"
+          git tag -f v1
+          git push -f origin v1
