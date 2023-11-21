@@ -1,0 +1,59 @@
+name: test
+
+on:
+  push:
+    branches:
+      - test
+
+env:
+  DOCKER_IMAGE: chuhlomin/render-template
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: PR Features
+        id: pr_features
+        run: |
+          FEATURE_COMMITS=$(git log --oneline --pretty=format:"%s" | grep -E '^(feat!|feat|fix|docs)')
+          echo "${FEATURE_COMMITS}"
+          {
+            echo 'pr_features<<EOF'
+            echo "${FEATURE_COMMITS}"
+            echo EOF
+          } >> $GITHUB_OUTPUT
+    
+      - name: PR Notes
+        id: pr_notes
+        run: |
+          COMMIT_BODIES=$(git log --pretty=format:"%s%n%b" | awk '/^(feat!|feat|fix|docs)/ {inBody=1; next} inBody {print $0; next} {inBody=0}' | awk '{printf "%s\\n", $0}')
+          echo "${COMMIT_BODIES}"
+          {
+            echo 'pr_notes<<EOF'
+            echo "${COMMIT_BODIES}"
+            echo EOF
+          } >> $GITHUB_OUTPUT
+
+      - name: Get Current Date
+        id: get_current_date
+        run: |
+          CURRENT_DATE=$(date +"%Y-%m-%d")
+          echo "current_date=${CURRENT_DATE}" >> $GITHUB_OUTPUT
+
+      - name: Test action
+        uses: ./ # Uses an action in the root directory
+        id: render
+        with:
+          template: ./testdata/pull_request_template.md
+          vars: |
+            pr_date: ${{ steps.get_current_date.outputs.current_date }}
+            pr_feature: "${{ steps.pr_features.outputs.pr_features }}"
+            pr_notes: "${{ steps.pr_notes.outputs.pr_notes }}"
+
+      - name: Get `result` output
+        run: echo "${{ steps.render.outputs.result }}"
