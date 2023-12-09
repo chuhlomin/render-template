@@ -7,7 +7,7 @@ RUN go test -mod=vendor -cover ./...
 RUN go build -mod=vendor -o /go/bin/app
 
 
-FROM --platform=$BUILDPLATFORM gcr.io/distroless/static
+FROM --platform=$BUILDPLATFORM gcr.io/distroless/static:966f4bd97f611354c4ad829f1ed298df9386c2ec
 # latest-amd64 -> 966f4bd97f611354c4ad829f1ed298df9386c2ec
 # https://github.com/GoogleContainerTools/distroless/tree/master/base
 
