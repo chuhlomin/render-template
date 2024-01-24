@@ -13,7 +13,7 @@ import (
 	"time"
 	_ "time/tzdata"
 
-	"github.com/caarlos0/env/v6"
+	"github.com/caarlos0/env/v10"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 	"gopkg.in/yaml.v3"
@@ -40,7 +40,7 @@ func run() error {
 	parsers := map[reflect.Type]env.ParserFunc{
 		reflect.TypeOf(vars{}): varsParser,
 	}
-	if err := env.ParseWithFuncs(&c, parsers); err != nil {
+	if err := env.ParseWithOptions(&c, env.Options{FuncMap: parsers}); err != nil {
 		return err
 	}
 

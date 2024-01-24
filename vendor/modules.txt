@@ -1,8 +1,8 @@
-# github.com/caarlos0/env/v6 v6.9.2
+# github.com/caarlos0/env/v10 v10.0.0
 ## explicit; go 1.17
-github.com/caarlos0/env/v6
-# golang.org/x/text v0.9.0
-## explicit; go 1.17
+github.com/caarlos0/env/v10
+# golang.org/x/text v0.14.0
+## explicit; go 1.18
 golang.org/x/text/feature/plural
 golang.org/x/text/internal
 golang.org/x/text/internal/catmsg
@@ -15,6 +15,6 @@ golang.org/x/text/internal/tag
 golang.org/x/text/language
 golang.org/x/text/message
 golang.org/x/text/message/catalog
-# gopkg.in/yaml.v3 v3.0.0
+# gopkg.in/yaml.v3 v3.0.1
 ## explicit
 gopkg.in/yaml.v3

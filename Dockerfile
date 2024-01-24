@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM:-linux/amd64} golang:1.17 as build-env
+FROM --platform=${TARGETPLATFORM:-linux/amd64} golang:1.21 as build-env
 
 WORKDIR /go/src/app
 ADD . /go/src/app
