@@ -26,6 +26,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           image_name: ${{ env.DOCKER_IMAGE }}
           tags: ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,windows/amd64,windows/arm64,windows/386,darwin/amd64,darwin/arm64
 
   update-tag:
     runs-on: ubuntu-latest
