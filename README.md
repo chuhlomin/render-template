@@ -6,6 +6,9 @@
 
 GitHub Action to render file based on template and passed variables.
 
+> [!NOTE]  
+> This is a Docker-based action and may not work on Windows and MacOS runners.
+
 ## Inputs
 
 | Name        | Description                                   | Required |
