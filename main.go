@@ -49,28 +49,28 @@ func run() error {
 	if c.VarsPath != "" {
 		varsFile, err := os.ReadFile(c.VarsPath)
 		if err != nil {
-			return fmt.Errorf("failed to read vars file %q: %v", c.VarsPath, err)
+			return fmt.Errorf("failed to read vars file %q: %w", c.VarsPath, err)
 		}
 		var varsFromFile vars
 		if err = yaml.Unmarshal(varsFile, &varsFromFile); err != nil {
-			return fmt.Errorf("failed to parse vars file %q: %v", c.VarsPath, err)
+			return fmt.Errorf("failed to parse vars file %q: %w", c.VarsPath, err)
 		}
 		c.Vars = mergeVars(c.Vars, varsFromFile)
 	}
 
 	output, err := renderTemplate(c.Template, c.Vars)
 	if err != nil {
-		return fmt.Errorf("failed to render template: %v", err)
+		return fmt.Errorf("failed to render template: %w", err)
 	}
 
-	if err = writeOutput(output); err != nil {
+	if err := writeOutput(output); err != nil {
 		return err
 	}
 
-	if len(c.ResultPath) != 0 {
-		err := os.WriteFile(c.ResultPath, []byte(output), 0644)
+	if c.ResultPath != "" {
+		err := os.WriteFile(c.ResultPath, []byte(output), 0o644)
 		if err != nil {
-			return fmt.Errorf("failed to write file %q: %v", c.ResultPath, err)
+			return fmt.Errorf("failed to write file %q: %w", c.ResultPath, err)
 		}
 	}
 
@@ -81,7 +81,7 @@ func varsParser(v string) (interface{}, error) {
 	m := map[string]interface{}{}
 	err := yaml.Unmarshal([]byte(v), &m)
 	if err != nil {
-		return nil, fmt.Errorf("unable to parse Vars: %v", err)
+		return nil, fmt.Errorf("unable to parse Vars: %w", err)
 	}
 	return m, nil
 }
@@ -167,7 +167,7 @@ func renderTemplate(templateFilePath string, vars vars) (string, error) {
 		if errors.Is(err, os.ErrPermission) {
 			return "", fmt.Errorf("have no permissions to read template file (%q)", templateFilePath)
 		}
-		return "", fmt.Errorf("failed to read template %q: %v", templateFilePath, err)
+		return "", fmt.Errorf("failed to read template %q: %w", templateFilePath, err)
 	}
 
 	tmpl, err := template.
@@ -180,7 +180,7 @@ func renderTemplate(templateFilePath string, vars vars) (string, error) {
 	}
 
 	var result bytes.Buffer
-	if err = tmpl.Execute(&result, vars); err != nil {
+	if err := tmpl.Execute(&result, vars); err != nil {
 		return "", err
 	}
 
@@ -195,7 +195,7 @@ func writeOutput(output string) error {
 
 	path := os.Getenv("GITHUB_OUTPUT")
 
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
 		return fmt.Errorf(
 			"failed to open result file %q: %v. "+
@@ -208,7 +208,7 @@ func writeOutput(output string) error {
 	defer f.Close()
 
 	if _, err = f.WriteString(githubOutput); err != nil {
-		return fmt.Errorf("failed to write result to file %q: %v", path, err)
+		return fmt.Errorf("failed to write result to file %q: %w", path, err)
 	}
 
 	return nil

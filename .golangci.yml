@@ -1,0 +1,4 @@
+linters-settings:
+  gosec:
+    excludes:
+      - G304 # Expect WriteFile permissions to be 0600 or less

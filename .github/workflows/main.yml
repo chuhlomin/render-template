@@ -15,6 +15,31 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - name: Go Format
+        run: gofmt -s -w -l $(find . -type f -name '*.go'| grep -v "/vendor/") && git diff --exit-code
+
+      - name: Go Vet
+        run: go vet ./...
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: latest
+
+      - name: Test
+        run: go test -v -count=1 -race -shuffle=on -coverprofile=coverage.txt -json ./... > test.json
+
+      - name: Annotate tests
+        if: always()
+        uses: guyarb/golang-test-annotations@v0.7.0
+        with:
+          test-results: test.json
+
       - name: Build and push Docker image
         uses: chuhlomin/actions/docker-build-push@main
         with:

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -163,11 +162,12 @@ QUJD
 		},
 	}
 
-	os.Setenv("INPUT_TIMEZONE", "America/New_York")
+	t.Setenv("INPUT_TIMEZONE", "America/New_York")
 
 	for _, tt := range tests {
 		output, err := renderTemplate(tt.templateFilePath, tt.vars)
-		if err != nil {
+		switch {
+		case err != nil:
 			if tt.expectedError == nil {
 				t.Errorf("renderTemplate(%q, %v) returned an error, but was expected to succeed: %v", tt.templateFilePath, tt.vars, err)
 			} else if err.Error() != tt.expectedError.Error() {
@@ -179,9 +179,9 @@ QUJD
 					err,
 				)
 			}
-		} else if tt.expectedError != nil {
+		case tt.expectedError != nil:
 			t.Errorf("renderTemplate(%q, %v) succeeded, but was expected to fail: %v", tt.templateFilePath, tt.vars, err)
-		} else if output != tt.expectedOutput {
+		case output != tt.expectedOutput:
 			t.Errorf(
 				"render(%q, %v) expected output: %q, got: %q",
 				tt.templateFilePath,
