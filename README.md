@@ -39,6 +39,11 @@ There are few template functions available:
 - `base64` – encodes string to base64.  
   Example: `{{ "hello" | base64 }}` will be rendered as `aGVsbG8=`.
 
+- `split` – splits string by delimiter.
+
+- `toJSON` – converts string to JSON.  
+  Example: `{{ "1,2,3" | split "," | toJSON }}` will be rendered as `["1","2","3"]`.
+
 ## Outputs
 
 | Name   | Description           |
