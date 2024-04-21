@@ -3,12 +3,14 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
 	_ "time/tzdata"
@@ -142,6 +144,17 @@ var funcMap = template.FuncMap{
 	},
 	"base64": func(in string) string {
 		return base64.StdEncoding.EncodeToString([]byte(in))
+	},
+	"split": func(sep string, in string) []string {
+		return strings.Split(in, sep)
+	},
+	"toJSON": func(in interface{}) string {
+		b, err := json.Marshal(in)
+		if err != nil {
+			log.Printf("failed to marshal to JSON: %v", err)
+			return ""
+		}
+		return string(b)
 	},
 }
 
