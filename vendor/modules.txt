@@ -1,7 +1,7 @@
 # github.com/caarlos0/env/v10 v10.0.0
 ## explicit; go 1.17
 github.com/caarlos0/env/v10
-# golang.org/x/text v0.15.0
+# golang.org/x/text v0.16.0
 ## explicit; go 1.18
 golang.org/x/text/feature/plural
 golang.org/x/text/internal
