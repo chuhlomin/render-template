@@ -13,19 +13,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Get the tag
         id: get_tag
         run: echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
-      - name: Build and push Docker image
-        uses: chuhlomin/actions/docker-build-push@main
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4.0.0
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4.1.0
         with:
           username: chuhlomin
           password: ${{ secrets.DOCKER_PASSWORD }}
-          image_name: ${{ env.DOCKER_IMAGE }}
-          tags: ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v4.1.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7.1.0
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
+            ghcr.io/${{ env.DOCKER_IMAGE }}:${{ steps.get_tag.outputs.tag }}
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
 
   update-tag:
     runs-on: ubuntu-latest
@@ -34,7 +53,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v1.')
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
 
       - name: Update v1 tag
         shell: bash
