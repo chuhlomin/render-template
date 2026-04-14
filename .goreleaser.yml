@@ -18,7 +18,7 @@ builds:
         goarch: arm
       - goos: windows
         goarch: arm
-    goflags:
+    flags:
       - -mod=vendor
     ldflags:
       - -w -s
