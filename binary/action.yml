@@ -40,6 +40,8 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}
+        ACTION_REPO: ${{ github.action_repository }}
+        ACTION_REF: ${{ github.action_ref }}
       run: |
         OS=$(echo "${{ runner.os }}" | tr '[:upper:]' '[:lower:]')
         [ "$OS" = "macos" ] && OS="darwin"
@@ -51,16 +53,10 @@ runs:
         BINARY="render-template_${OS}_${ARCH}${EXT}"
         DEST="$RUNNER_TEMP/render-template"
         mkdir -p "$DEST"
-        TAG="${{ github.action_ref }}"
-        gh release download "$TAG" \
-          --repo "${{ github.action_repository }}" \
+        gh release download "${ACTION_REF}" \
+          --repo "${ACTION_REPO:-chuhlomin/render-template}" \
           --pattern "$BINARY" \
-          --dir "$DEST" 2>/dev/null \
-        || (echo "::warning::Release '$TAG' not found, falling back to latest" && \
-            gh release download --latest \
-              --repo "${{ github.action_repository }}" \
-              --pattern "$BINARY" \
-              --dir "$DEST")
+          --dir "$DEST"
         [ "$OS" != "windows" ] && chmod +x "$DEST/$BINARY"
         echo "RENDER_TEMPLATE_BIN=$DEST/$BINARY" >> "$GITHUB_ENV"
 
