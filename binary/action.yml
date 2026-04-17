@@ -51,12 +51,29 @@ runs:
         EXT=""
         [ "$OS" = "windows" ] && EXT=".exe"
         BINARY="render-template_${OS}_${ARCH}${EXT}"
+        REPO="${ACTION_REPO:-chuhlomin/render-template}"
         DEST="$RUNNER_TEMP/render-template"
         mkdir -p "$DEST"
-        gh release download "${ACTION_REF}" \
-          --repo "${ACTION_REPO:-chuhlomin/render-template}" \
+        echo "Downloading ${BINARY} from ${REPO}@${ACTION_REF}"
+        if ! gh release download "${ACTION_REF}" \
+          --repo "${REPO}" \
           --pattern "$BINARY" \
-          --dir "$DEST"
+          --dir "$DEST" 2>/dev/null; then
+          echo "'${ACTION_REF}' is not a release tag, resolving to latest '${ACTION_REF}.*'"
+          RESOLVED_TAG="$(gh release list \
+            --repo "${REPO}" \
+            --json tagName \
+            --jq "first(.[] | select(.tagName | startswith(\"${ACTION_REF}.\"))) | .tagName")"
+          [ -z "$RESOLVED_TAG" ] && echo "::error::No release found matching '${ACTION_REF}.*'" && exit 1
+          echo "Resolved to ${RESOLVED_TAG}"
+          if ! gh release download "${RESOLVED_TAG}" \
+            --repo "${REPO}" \
+            --pattern "$BINARY" \
+            --dir "$DEST"; then
+            echo "::error::No asset '${BINARY}' found in release '${RESOLVED_TAG}'"
+            exit 1
+          fi
+        fi
         [ "$OS" != "windows" ] && chmod +x "$DEST/$BINARY"
         echo "RENDER_TEMPLATE_BIN=$DEST/$BINARY" >> "$GITHUB_ENV"
 
