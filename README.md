@@ -7,7 +7,10 @@
 GitHub Action to render file based on template and passed variables.
 
 > [!NOTE]  
-> This is a Docker-based action and may not work on Windows and MacOS runners.
+> This is a Docker-based action and may not work on Windows and macOS runners.
+>
+> If you run into docker-related issues on your runner (e.g. `ubuntu-slim`),  
+> please use the binary version of the action instead: `chuhlomin/render-template/binary@v1`
 
 ## Inputs
 
