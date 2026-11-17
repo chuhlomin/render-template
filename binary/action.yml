@@ -54,11 +54,36 @@ runs:
         REPO="${ACTION_REPO:-chuhlomin/render-template}"
         DEST="$RUNNER_TEMP/render-template"
         mkdir -p "$DEST"
+        PINNED_SHA=""
+        if [[ "$ACTION_REF" =~ ^[0-9a-fA-F]{40}$ ]]; then
+          PINNED_SHA="$(echo "$ACTION_REF" | tr '[:upper:]' '[:lower:]')"
+          MATCHING_TAGS="$(gh api --paginate \
+            "repos/${REPO}/tags?per_page=100" \
+            --jq ".[] | select(.commit.sha == \"${PINNED_SHA}\") | .name")"
+          RELEASE_TAG=""
+          while IFS= read -r TAG; do
+            [ -z "$TAG" ] && continue
+            if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+              RELEASE_TAG="$TAG"
+              break
+            fi
+          done <<< "$MATCHING_TAGS"
+          if [ -z "$RELEASE_TAG" ]; then
+            echo "::error::No release tag points to commit ${PINNED_SHA}"
+            exit 1
+          fi
+          echo "Resolved commit ${PINNED_SHA} to release ${RELEASE_TAG}"
+          ACTION_REF="$RELEASE_TAG"
+        fi
         echo "Downloading ${BINARY} from ${REPO}@${ACTION_REF}"
         if ! gh release download "${ACTION_REF}" \
           --repo "${REPO}" \
           --pattern "$BINARY" \
           --dir "$DEST" 2>/dev/null; then
+          if [ -n "$PINNED_SHA" ]; then
+            echo "::error::Failed to download '${BINARY}' from release '${ACTION_REF}' for commit ${PINNED_SHA}"
+            exit 1
+          fi
           echo "'${ACTION_REF}' is not a release tag, resolving to latest '${ACTION_REF}.*'"
           RESOLVED_TAG="$(gh release list \
             --repo "${REPO}" \
